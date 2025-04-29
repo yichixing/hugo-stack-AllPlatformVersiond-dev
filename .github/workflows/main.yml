@@ -1,0 +1,30 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Dev Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: 'latest'
+          extended: true
+
+      - name: Build with GitHub BaseURL
+        run: hugo -D -b "https://yichixing.github.io/hugo-stack-AllPlatformVersiond-dev/"
+
+      - name: Deploy to GH Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          PERSONAL_TOKEN: ${{ secrets.TOKEN }}
+          PUBLISH_DIR: ./public
+          PUBLISH_BRANCH: gh-pages
+          commit_message: auto deploy
