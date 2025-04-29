@@ -1,0 +1,93 @@
+{{/* layouts/categories2/list.html */}}
+{{ define "main" }}
+    <header class="page-header">
+        {{/* Add class for styling and wrap title in span */}}
+        <h1 class="page-title page-title-with-icon">
+            {{ partial "helper/icon" "categories" }} {{/* Use the correct categories (#) icon */}}
+            <span>{{ .Title }}</span>
+        </h1>
+        {{/* Optional: Add a description from _index.md if needed */}}
+        {{/* if .Description }}
+        <div class="page-description">{{ .Description }}</div>
+        {{ end */}}
+    </header>
+
+    {{/* Use a CSS grid container */}}
+    <div class="categories-grid-container">
+        {{/* Get all categories, sort alphabetically for consistency */}}
+        {{ $taxonomy := "categories" }}
+        {{ $terms := .Site.Taxonomies.categories.Alphabetical }}
+
+        {{ range $term := $terms }}
+            <section class="category-card"> {{/* Changed class name */}}
+                <h2 class="category-card-title"> {{/* Changed class name */}}
+                    {{/* Modify link to include icon and span for text */}}
+                    <a href="{{ $term.Page.RelPermalink }}">
+                         {{ partial "helper/icon" "category-card-icon" }} {{/* Call the new icon */}}
+                         <span>{{ $term.Page.Title }}</span>
+                         <sup>({{ $term.Count }})</sup>
+                    </a>
+                </h2>
+                
+                {{/* --- START: Add Tags display area under category title --- */}}
+                {{ $allTagsInCategory := slice }}
+                {{ range $term.Pages }}
+                    {{ with .Params.tags }}
+                        {{ range . }}
+                            {{ $allTagsInCategory = $allTagsInCategory | append . }}
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+                
+                {{ $uniqueTags := slice }}
+                {{ range $allTagsInCategory }}
+                    {{ $tag := . }}
+                    {{ $exists := false }}
+                    {{ range $uniqueTags }}
+                        {{ if eq . $tag }}
+                            {{ $exists = true }}
+                        {{ end }}
+                    {{ end }}
+                    {{ if not $exists }}
+                        {{ $uniqueTags = $uniqueTags | append $tag }}
+                    {{ end }}
+                {{ end }}
+                
+                {{ if $uniqueTags }}
+                <div class="category-tags-container">
+                    <span class="tag-list">
+                        {{ range $uniqueTags }}
+                            {{ $tagURL := printf "/tags/%s" (. | urlize) }}
+                            <a href="{{ $tagURL | relLangURL }}" class="tag-badge">{{ . }}</a>
+                        {{ end }}
+                    </span>
+                </div>
+                {{ end }}
+                {{/* --- END: Add Tags display area --- */}}
+                
+                <ul class="category-card-posts"> {{/* Changed class name */}}
+                    {{/* Limit the number of posts shown, e.g., first 5 */}}
+                    {{ $limit := 5 }}
+                    {{ range first $limit $term.Pages }}
+                        <li>
+                            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                            {{/* 移除此处的标签显示 */}}
+                            {{/* Optional: Add date or other meta */}}
+                            {{/*<span class="post-meta">{{ .Date.Format (.Site.Params.dateFormat.article | default "Jan 2, 2006") }}</span> */}}
+                        </li>
+                    {{ end }}
+                </ul>
+                {{/* Add "More >>" link if there are more posts */}}
+                {{ if gt $term.Count $limit }}
+                    <a href="{{ $term.Page.RelPermalink }}" class="category-card-more">More >></a>
+                {{ end }}
+            </section>
+        {{ end }}
+    </div>
+
+{{ end }}
+
+{{/* Add this block to include the right sidebar */}}
+{{ define "right-sidebar" }}
+    {{ partial "sidebar/right.html" (dict "Context" . "Scope" "section") }} {{/* Changed scope to section for clarity */}}
+{{ end }} 

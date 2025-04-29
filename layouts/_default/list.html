@@ -1,0 +1,465 @@
+{{ define "main" }}
+    <header>
+        <h3 class="section-title">
+            {{ if eq .Parent (.GetPage "/") }}
+                {{ T "list.section" }}
+            {{ else }}
+                {{ .Parent.Title }}
+            {{ end }}
+        </h3>
+
+        <div class="section-card">
+            <div class="section-details">
+                {{/* --- REMOVED START: Display Series for Category Term Page --- */}}
+                {{/* Code block previously added here is now removed */}}
+                {{/* --- REMOVED END: Display Series for Category Term Page --- */}}
+
+                <h3 class="section-count">{{ T "list.page" (len .Pages) }}</h3>
+                <h1 class="section-term">{{ .Title }}</h1>
+                
+                {{ if eq .Kind "term" }}
+                    {{ if eq .Parent.RelPermalink "/tags/" }}
+                        {{/* 删除旧的分类显示区域 */}}
+                        {{/* <div class="term-categories-display"> ... </div> */}}
+                        
+                        {{/* 新增：显示与当前标签相关的 Collections */}}
+                        <div class="term-collections-display">
+                            
+                            {{ $currentTag := .Title }}
+                            {{ $relatedCollections := slice }}
+                            
+                            {{/* 收集与当前标签相关的所有 Collections */}}
+                            {{ range .Pages }}
+                                {{ with .Params.collections }}
+                                    {{ if reflect.IsSlice . }}
+                                        {{ range . }}
+                                            {{ $relatedCollections = $relatedCollections | append . }}
+                                        {{ end }}
+                                    {{ else }}
+                                        {{ $relatedCollections = $relatedCollections | append . }}
+                                    {{ end }}
+                                {{ end }}
+                            {{ end }}
+                            
+                            {{/* 去重 Collections 列表 */}}
+                            {{ $uniqueCollections := $relatedCollections | uniq | sort }}
+                            
+                            {{ if gt (len $uniqueCollections) 0 }}
+                                {{ range $collection := $uniqueCollections }}
+                                    <span class="term-collection-badge">{{ $collection }}</span>
+                                {{ end }}
+                            {{ else }}
+                                <p class="no-collections-found">未找到相关合集</p>
+                            {{ end }}
+                        </div>
+                        
+                        {{/* 添加 Collections 标签样式 */}}
+                        <style>
+                        .term-collections-display {
+                            margin: 1rem 0;
+                        }
+                        .term-collections-display h4 {
+                            margin-bottom: 0.8rem;
+                            font-size: 1.6rem;
+                            color: #333;
+                            font-weight: 600;
+                        }
+                        .term-collection-badge {
+                                display: inline-block;
+                            margin: 0.3rem;
+                            padding: 0.4rem 0.8rem;
+                            background-color: #707070;
+                                color: white;
+                                border-radius: 4px;
+                            font-size: 1.6rem;
+                                text-decoration: none;
+                        }
+                        .no-collections-found {
+                            font-style: italic;
+                            color: #666;
+                            margin: 1rem 0;
+                        }
+                        /* --- 隐藏旧的分类显示样式（如果之前有） --- */
+                        .term-categories-display {
+                            display: none;
+                            }
+                        .term-category-badge {
+                           /* 可以保留，以防其他地方用到，或删除 */
+                            }
+                        </style>
+                    {{ else }}
+                        {{ $allCollectionsInTerm := slice }}
+                        {{ range .Pages }}
+                            {{ if .Params.collections }}
+                                {{ if reflect.IsSlice .Params.collections }}
+                                    {{ range .Params.collections }}
+                                        {{ $allCollectionsInTerm = $allCollectionsInTerm | append . }}
+                                    {{ end }}
+                                {{ else }}
+                                    {{ $allCollectionsInTerm = $allCollectionsInTerm | append .Params.collections }}
+                                {{ end }}
+                            {{ end }}
+                        {{ end }}
+                        
+                        {{ $uniqueCollections := $allCollectionsInTerm | uniq }}
+                        {{ if gt (len $uniqueCollections) 0 }}
+                            <div class="term-summary-collections">
+                                {{ range $uniqueCollections }}
+                                    <span class="term-summary-collection-badge">{{ . }}</span>
+                                {{ end }}
+                            </div>
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+                
+                {{ with .Params.description }}
+                    <h2 class="section-description">{{ . }}</h2>
+                {{ end }}
+            </div>
+    
+            {{- $image := partialCached "helper/image" (dict "Context" . "Type" "section") .RelPermalink "section" -}}
+            {{ if $image.exists }}
+                <div class="section-image">
+                    {{ if $image.resource }}
+                        {{- $Permalink := $image.resource.RelPermalink -}}
+                        {{- $Width := $image.resource.Width -}}
+                        {{- $Height := $image.resource.Height -}}
+    
+                        {{- if (default true .Page.Site.Params.imageProcessing.cover.enabled) -}}
+                            {{- $thumbnail := $image.resource.Fill "120x120" -}}
+                            {{- $Permalink = $thumbnail.RelPermalink -}}
+                            {{- $Width = $thumbnail.Width -}}
+                            {{- $Height = $thumbnail.Height -}}
+                        {{- end -}}
+                        
+                        <img src="{{ $Permalink }}" 
+                            width="{{ $Width }}"
+                            height="{{ $Height }}" 
+                            loading="lazy">
+                    {{ else }}
+                        <img src="{{ $image.permalink }}" loading="lazy" />
+                    {{ end }}
+                </div>
+            {{ end }}
+        </div>
+    </header>
+
+    {{- $subsections := .Sections -}}
+    {{- $pages := .Pages | complement $subsections -}}
+    
+    {{- if eq (len $pages) 0 -}}
+        {{/* If there are no normal pages, display subsections in list style, with pagination */}}
+        {{/* This happens with taxonomies like categories or tags */}}
+        {{- $pages = $subsections -}}
+        {{- $subsections = slice -}}
+    {{- end -}}
+
+    {{- with $subsections -}}
+        <aside>
+            <h2 class="section-title">{{ T "list.subsection" (len $subsections) }}</h2>
+            <div class="subsection-list">
+                <div class="article-list--tile">
+                    {{ range . }}
+                        {{ partial "article-list/tile" (dict "context" . "size" "250x150" "Type" "section") }}
+                    {{ end }}
+                </div>
+            </div>
+        </aside>
+    {{- end -}}
+    
+    {{/* List only pages that are not a subsection */}}
+    {{ $paginator := .Paginate $pages }}
+    <section class="article-list--compact">
+        {{ range $paginator.Pages }}
+            {{ partial "article-list/compact" . }}
+        {{ end }}
+    </section>
+
+    {{- partial "pagination.html" . -}}
+
+    {{/* --- START: Modify Collections Section for Current Term --- */}}
+    {{ if eq .Kind "term" }} {{/* Only show this on specific term pages */}}
+        {{ $termPages := .Pages }}
+        {{ $tagsInTerm := slice }} {{/* Create empty slice to hold tag names */}}
+        {{ range $termPages }}
+            {{ with .Params.tags }}
+                {{ if reflect.IsSlice . }}
+                    {{ range . }}
+                        {{ $tagsInTerm = $tagsInTerm | append . }}
+                    {{ end }}
+                {{ else }}
+                    {{ $tagsInTerm = $tagsInTerm | append . }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+        {{ $uniqueTags := $tagsInTerm | uniq | sort }} {{/* Get unique, sorted tag names */}}
+
+        {{ if gt (len $uniqueTags) 0 }}
+            <section class="term-tags-section">
+                <hr>
+                {{/* Add class and icon to H2 */}}
+                <h2 class="term-tags-section-title">
+                    {{ if eq .Parent.RelPermalink "/tags/" }}
+                        {{ partial "helper/icon" "categories" }} {{/* 使用categories图标 */}}
+                        <span>"Tag：{{ .Title }}"的相关的categories</span>
+                    {{ else }}
+                        {{ partial "helper/icon" "tags" }}
+                        <span>"categories：{{ .Title }}"的相关Tags</span>
+                    {{ end }}
+                </h2>
+                {{ if eq .Parent.RelPermalink "/tags/" }}
+                    {{/* 标签页面显示相关分类 */}}
+                    <div class="term-categories-container">
+                        {{ $currentTag := .Title }}
+                        {{ $relatedCategories := slice }}
+                        
+                        {{/* 收集与当前标签相关的所有分类 */}}
+                        {{ range .Pages }}
+                            {{ if .Params.categories }}
+                                {{ if reflect.IsSlice .Params.categories }}
+                                    {{ range .Params.categories }}
+                                        {{ $relatedCategories = $relatedCategories | append . }}
+                                    {{ end }}
+                                {{ else }}
+                                    {{ $relatedCategories = $relatedCategories | append .Params.categories }}
+                                {{ end }}
+                            {{ end }}
+                        {{ end }}
+                        
+                        {{/* 去重分类列表 */}}
+                        {{ $uniqueCategories := $relatedCategories | uniq | sort }}
+                        
+                        {{ if gt (len $uniqueCategories) 0 }}
+                            {{ range $category := $uniqueCategories }}
+                                <a href="{{ (printf "/categories/%s" (urlize $category)) | relURL }}" class="term-category-badge">{{ $category }}</a>
+                            {{ end }}
+                        {{ else }}
+                            <p class="no-categories-found">未找到相关分类</p>
+                        {{ end }}
+                    </div>
+                    
+                    {{/* 新增：按分类分组的文章列表 */}}
+                    <div class="category-grouped-posts">
+                        {{ $currentTag := .Title }}
+                        {{ $pagesInTag := .Pages }}
+                        {{ $categoriesInTag := slice }}
+                        
+                        {{/* 收集所有相关的分类 */}}
+                        {{ range $pagesInTag }}
+                            {{ with .Params.categories }}
+                                {{ if reflect.IsSlice . }}
+                                    {{ range . }}
+                                        {{ $categoriesInTag = $categoriesInTag | append . }}
+                                    {{ end }}
+                                {{ else }}
+                                    {{ $categoriesInTag = $categoriesInTag | append . }}
+                                {{ end }}
+                            {{ end }}
+                        {{ end }}
+                        
+                        {{/* 去重并排序分类 */}}
+                        {{ $uniqueCategories := $categoriesInTag | uniq | sort }}
+                        
+                        {{ if gt (len $uniqueCategories) 0 }}
+                            {{ range $category := $uniqueCategories }}
+                                {{/* 为每个分类创建一个卡片 */}}
+                                <div class="category-group-card">
+                                    <h3 class="category-group-title">{{ $category }}</h3>
+                                    <ul class="category-group-post-list">
+                                        {{ range $pagesInTag }}
+                                            {{ $currentPage := . }}
+                                            {{ $pageCategories := slice }}
+                                            {{ with .Params.categories }}
+                                                {{ if reflect.IsSlice . }}
+                                                    {{ $pageCategories = . }}
+                                                {{ else }}
+                                                    {{ $pageCategories = slice . }}
+                                                {{ end }}
+                                            {{ end }}
+                                            
+                                            {{/* 检查当前文章是否属于这个分类 */}}
+                                            {{ if in $pageCategories $category }}
+                                                <li>
+                                                    <a href="{{ $currentPage.RelPermalink }}" class="category-group-post-title">{{ $currentPage.Title }}</a>
+                                                </li>
+                                            {{ end }}
+                                        {{ end }}
+                                    </ul>
+                                </div>
+                            {{ end }}
+                        {{ else }}
+                            {{/* 如果没有任何文章有分类，可以显示提示 */}}
+                            <p class="no-posts-with-category">此标签下暂无分类的文章</p>
+                        {{ end }}
+                    </div>
+                    
+                    <style>
+                        /* --- 保留顶部分类徽章样式 --- */
+                        .term-categories-container {
+                            margin-bottom: 2rem; 
+                        }
+                        .term-category-badge { 
+                            /* ... 样式保持不变 ... */
+                            display: inline-block;
+                            margin: 0.2rem;
+                            padding: 0.3rem 0.6rem;
+                            background-color: #9b7bde;
+                            color: white;
+                            border-radius: 4px;
+                            font-size: 1.8rem;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                        }
+                        .term-category-badge:hover {
+                            background-color: #2b84bc;
+                            color: white;
+                        }
+                        .no-categories-found {
+                            font-style: italic;
+                            color: #666;
+                            margin: 1rem 0;
+                        }
+                        
+                        /* --- 隐藏旧的文章列表样式 --- */
+                        .tag-posts-list {
+                            display: none;
+                        }
+                        
+                        /* --- 新的按分类分组卡片样式 --- */
+                        .category-grouped-posts {
+                            margin-top: 1rem;
+                        }
+                        .category-group-card {
+                            background-color: #f8f9fa;
+                            padding: 1.5rem;
+                            margin-bottom: 1.5rem;
+                            border-radius: 5px;
+                            border-left: 5px solid #9b7bde;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+                        }
+                        .category-group-title {
+                            font-size: 2rem; /* 分类标题字体 */
+                            color: #8a63d2;
+                            font-weight: 700;
+                            margin: 0 0 1rem 0; /* 调整边距 */
+                            padding-bottom: 0.5rem;
+                            border-bottom: 1px solid #e0e0e0;
+                        }
+                        .category-group-post-list {
+                            list-style: none;
+                            padding: 0;
+                            margin: 0;
+                        }
+                        .category-group-post-list li {
+                            margin-bottom: 0.6rem;
+                        }
+                        .category-group-post-title {
+                            font-size: 1.8rem; /* 文章标题字体 */
+                            color: #070707;
+                            text-decoration: none;
+                            font-weight: 700;
+                            line-height: 1.4;
+                            transition: color 0.3s ease;
+                        }
+                        .category-group-post-title:hover {
+                            color: #2983c1;
+                            text-decoration: underline;
+                        }
+                        .no-posts-with-category {
+                            font-style: italic;
+                            color: #666;
+                            margin: 1rem 0;
+                        }
+                    </style>
+                {{ else if not (eq .Parent.RelPermalink "/tags/") }}
+                    {{/* 在分类页面显示相关标签 */}}
+                    <div class="term-tags-container">
+                        {{ range $tagName := $uniqueTags }}
+                            {{ $pagesWithTag := slice }} {{/* Pages with this tag AND in current term */}}
+                            {{ range $termPages }}
+                                {{ if and .Params.tags (in .Params.tags $tagName) }}
+                                    {{ $pagesWithTag = $pagesWithTag | append . }}
+                                {{ end }}
+                            {{ end }}
+                            {{ if gt (len $pagesWithTag) 0 }}
+                                <a href="{{ (printf "/tags/%s" (urlize $tagName)) | relURL }}" class="term-tag-badge">{{ $tagName }}</a>
+                            {{ end }}
+                        {{ end }}
+                    </div>
+                    
+                    {{/* 添加标签样式 */}}
+                    <style>
+                        .term-tags-container {
+                            margin: 0.3rem 0 1rem 0;  /* 减小上边距，增加与标题的接近度 */
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 0.5rem;
+                        }
+                        .term-tag-badge {
+                            display: inline-block;
+                            padding: 0.3rem 0.6rem;
+                            background-color: #2c3e50;
+                            color: white;
+                            border-radius: 4px;
+                            font-size: 1.5rem;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                        }
+                        .term-tag-badge:hover {
+                            background-color: #2983c1;
+                            color: white;
+                            transform: translateY(-2px);
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        }
+                        /* 使相关标签标题与标签之间更紧凑 */
+                        .term-tags-section-title {
+                            margin-bottom: 0.5rem;
+                        }
+                        /* 增加原始标签卡片的上边距，与新标签分开 */
+                        .term-tag-card:first-of-type {
+                            margin-top: 1.5rem;
+                        }
+                    </style>
+                    
+                    {{/* 原有的标签内容（保持不变） */}}
+                    {{ range $tagName := $uniqueTags }}
+                        {{ $pagesWithTag := slice }} {{/* Pages with this tag AND in current term */}}
+                        {{ range $termPages }}
+                            {{ if and .Params.tags (in .Params.tags $tagName) }}
+                                {{ $pagesWithTag = $pagesWithTag | append . }}
+                            {{ end }}
+                        {{ end }}
+                        {{ if gt (len $pagesWithTag) 0 }}
+                            <div class="term-tag-card">
+                                <h3 class="term-tag-title">
+                                    {{ partial "helper/icon" "tag" }} {{/* Use a tag icon */}}
+                                    {{ $tagName }}
+                                    <sup>({{ len $pagesWithTag }})</sup>
+                                </h3>
+                                <ul class="term-tag-post-list">
+                                    {{ range $pagesWithTag }}
+                                        <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+                                    {{ end }}
+                                </ul>
+                            </div>
+                        {{ end }}
+                    {{ end }}
+                {{ end }}
+            </section>
+        {{ end }}
+    {{ end }}
+    {{/* --- END: Modify Collections Section --- */}}
+
+    {{ partialCached "footer/footer" . }}
+{{ end }}
+
+{{ define "right-sidebar" }}
+    {{/* IMPORTANT: Determine the correct scope based on the page kind */}}
+    {{ $scope := "page" }}
+    {{ if .IsHome }}{{ $scope = "homepage" }}
+    {{ else if eq .Kind "taxonomy" }}{{ $scope = "taxonomy" }}
+    {{ else if eq .Kind "term" }}{{ $scope = "taxonomy" }} {{/* Or define a 'term' scope in config */}}
+    {{ else if eq .Kind "section" }}{{ $scope = "section" }}
+    {{ end }}
+    {{ partial "sidebar/right.html" (dict "Context" . "Scope" $scope) }}
+{{ end }} 

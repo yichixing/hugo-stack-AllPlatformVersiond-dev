@@ -1,0 +1,109 @@
+body {
+  background-color: black;
+}
+
+/* Custom styles for single post meta to resemble target image */
+.single .post-meta {
+  /* Slightly larger font size for the meta line */
+  font-size: 0.9rem;
+  /* Adjust margin if needed */
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.single .post-meta .post-meta-line > span {
+  /* Ensure elements are displayed inline and add spacing */
+  display: inline-block;
+  margin-right: 0.8em; /* Space between author, category, etc. */
+  vertical-align: middle; /* Align items vertically */
+}
+
+.single .post-meta .post-author-name {
+  /* Style the author name link */
+  font-weight: 600; /* Make author name slightly bolder */
+  color: #555; /* Example color, adjust as needed */
+  text-decoration: none;
+}
+.single .post-meta .post-author-name:hover {
+  color: #007bff; /* Example hover color */
+}
+
+.single .post-meta .post-category a {
+  /* Style the category link */
+  color: #007bff; /* Example link color */
+  text-decoration: none;
+  padding: 0.1em 0.4em; /* Add slight padding */
+  border: 1px solid #ddd; /* Add a light border */
+  border-radius: 3px; /* Rounded corners */
+  font-size: 0.85rem; /* Slightly smaller font for category */
+  margin-left: 0.5em; /* Add space before the category */
+}
+
+.single .post-meta .post-category a:hover {
+  background-color: #f0f0f0; /* Light background on hover */
+  border-color: #ccc;
+}
+
+/* Hide default icons if they exist (adjust selector if needed) */
+.single .post-meta .post-meta-line > span > .icon {
+  display: none;
+}
+.single .post-meta .post-author .fa-fw { /* Hide FontAwesome icons specifically for author if used */
+    display: none;
+}
+.single .post-meta .post-category .fa-fw { /* Hide FontAwesome icons specifically for category if used */
+    display: none;
+}
+
+/* Custom styles for the site header */
+#header-desktop .header-wrapper {
+  /* Light background color for the header */
+  background-color: #e0d6ff !important; /* Light purple */
+  /* Add a subtle bottom border */
+  border-bottom: 1px solid #d1c4e9 !important; /* Adjusted border color */
+  /* Add some padding inside the header */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Adjust site title style */
+#header-desktop .header-title a {
+  /* Example: Make title slightly bolder and adjust color */
+  font-weight: 600;
+  color: #343a40; /* Darker gray for title */
+  text-decoration: none;
+}
+#header-desktop .header-title a:hover {
+  color: #0056b3; /* Link hover color */
+}
+
+/* Adjust navigation menu link style */
+#header-desktop .menu-item > .menu-link {
+  /* Example: Adjust link color */
+  color: #495057; /* Medium gray for nav links */
+}
+#header-desktop .menu-item > .menu-link:hover,
+#header-desktop .menu-item.active > .menu-link {
+  /* Example: Adjust hover/active link color */
+  color: #007bff;
+}
+
+/* Optional: Add a subtle shadow instead of/in addition to border */
+/* Remove or comment out border-bottom above if using shadow */
+/*
+#header-desktop .header-wrapper {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+*/
+
+/* Optional: Adjust overall header height if needed */
+/*
+#header-desktop {
+  height: 65px; // Example height
+}
+#header-desktop .header-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+*/ 

@@ -1,0 +1,80 @@
+{{- define "title" -}}
+  {{- .Title }} - {{ T .Data.Singular | default .Data.Singular -}}
+  {{- if .Site.Params.withSiteTitle }} {{ .Site.Params.titleDelimiter }} {{ .Site.Title }}{{- end -}}
+{{- end -}}
+
+{{- define "content" -}}
+  <div class="page archive">
+    {{- /* Title */ -}}
+    {{- $taxonomy := .Data.Singular -}}
+    {{- $pageCount := len .Pages -}}
+    {{- $termIcon := "" -}}
+    {{- $termTitle := .Title -}}
+    {{- if eq $taxonomy "category" -}}
+      {{- $termIcon = "fa-regular fa-folder-open" -}}
+    {{- else if eq $taxonomy "tag" -}}
+      {{- $termIcon = "fa-solid fa-tag" -}}
+    {{- else if eq $taxonomy "collection" -}}
+      {{- $termIcon = "fa-solid fa-layer-group" -}}
+    {{- else -}}
+      {{- $termTitle = printf "%v - %v" (T $taxonomy | default $taxonomy) .Title -}}
+    {{- end -}}
+    <h1 class="single-title animate__animated animate__pulse animate__faster">
+      {{- with $termIcon -}}
+        {{- dict "Class" (add . " fa-fw me-1") | partial "plugin/icon.html" -}}
+      {{- end -}}
+      {{- $termTitle }} <sup>{{ $pageCount }}</sup>
+    </h1>
+
+    {{- /* Paginate */ -}}
+    {{- if .Pages -}}
+      {{- /* Manual grouping by collections - Alternative method */ -}}
+      {{- $scratch := newScratch -}}
+      {{- $scratch.Set "groups" (dict) -}} {{/* Initialize empty map */}}
+      {{- range .Pages -}}
+        {{- $currentPage := . -}}
+        {{- with .Params.collections -}}
+          {{- range . -}}
+            {{- $collectionName := . -}}
+            {{- $groupsMap := $scratch.Get "groups" -}}
+            {{- $pagesInCollection := index $groupsMap $collectionName | default slice -}}
+            {{- $pagesInCollection = $pagesInCollection | append $currentPage -}}
+            {{- $scratch.Set "groups" (merge $groupsMap (dict $collectionName $pagesInCollection)) -}} {{/* Update map in scratch */}}
+          {{- end -}}
+        {{- end -}}
+      {{- end -}}
+      {{- $groupedPages := $scratch.Get "groups" -}}
+
+      {{- /* Temporarily disable pagination for debugging */ -}}
+      {{- /* {{- with .Site.Params.list.paginate | default .Site.Params.paginate -}} */ -}}
+      {{- /*   {{- $pages = $.Paginate $pages . -}} */ -}}
+      {{- /* {{- else -}} */ -}}
+      {{- /*   {{- $pages = .Paginate $pages -}} */ -}}
+      {{- /* {{- end -}} */ -}}
+      {{- partial "recently-updated.html" . -}}
+      {{- range $collectionName, $pagesInCollection := $groupedPages -}}
+        <h2 class="group-title">
+          {{- dict "Class" "fa-solid fa-layer-group fa-fw me-1" | partial "plugin/icon.html" -}}
+          {{- $collectionName -}}
+        </h2>
+        {{- range $pagesInCollection -}}
+          <article class="archive-item">
+            <a href="{{ .RelPermalink }}" class="archive-item-link">
+              {{- $repost := .Params.repost | default dict -}}
+              {{- if eq $repost.enable true -}}
+                {{- dict "Class" "fa-solid fa-share fa-fw text-success me-1" | partial "plugin/icon.html" -}}
+              {{- end -}}
+              {{- cond (.Param "capitalizeTitles") (title .LinkTitle) .LinkTitle -}}
+            </a>
+            {{- with .Params.tags -}}
+              {{- range first 1 . -}}
+                <span class="archive-item-tag">{{ . }}</span>
+              {{- end -}}
+            {{- end -}}
+          </article>
+        {{- end -}}
+      {{- end -}}
+      {{- /* {{- partial "paginator.html" . -}} */ -}}
+    {{- end -}}
+  </div>
+{{- end -}}

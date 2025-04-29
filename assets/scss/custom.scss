@@ -1,0 +1,537 @@
+/* assets/scss/custom.scss */
+
+/* Style for the /categories2/ grid layout */
+.categories-grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Create 2 equal columns */
+  gap: 1rem; /* Keep user's value */
+  margin-top: -4rem; /* Significantly reduce space below the header */
+}
+
+.category-card {
+  border: 1px solid var(--card-border-color); /* Use theme's border color */
+  padding: 1.5rem;
+  border-radius: var(--card-border-radius); /* Use theme's border radius */
+  background-color: var(--card-background); /* Use theme's card background */
+  display: flex; /* Use flexbox for internal layout */
+  flex-direction: column; /* Stack title, list, more-link vertically */
+  box-shadow: var(--card-box-shadow); /* Use theme's shadow */
+}
+
+.category-card-title {
+  margin-top: 0;
+  margin-bottom: 0.1rem; /* Keep user's value */
+  font-size: 1.5em; /* Keep user's value */
+  /* Remove alignment from H2, apply to link instead */
+}
+
+.category-card-title a { /* Apply flex to the link */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em; /* Adjust gap */
+  text-decoration: none;
+  color: inherit; /* Inherit color from H2 or parent */
+}
+
+.category-card-title a svg { /* Style the icon */
+  width: 1em; /* Base size on font-size */
+  height: 1em;
+  fill: currentColor; /* Make icon color match text */
+  flex-shrink: 0;
+  /* Remove stroke if fill is used */
+  stroke: none;
+}
+
+.category-card-title a span { /* The text part */
+  /* No specific styles needed unless overriding */
+}
+
+.category-card-title a sup { /* The count */
+  font-size: 0.7em; /* Adjust size relative to title */
+  margin-left: 0.3em;
+  color: var(--secondary-text-color);
+  white-space: normal;
+  align-self: flex-start; /* Align count closer to the top */
+}
+
+.category-card-title a:hover { /* Hover state for the link */
+  text-decoration: none;
+  color: #2983bb; /* Blue text */
+}
+.category-card-title a:hover svg { /* Hover state for the icon */
+  fill: #2983bb; /* Blue icon fill */
+}
+.category-card-title a:hover sup { /* Keep count color consistent on hover */
+   color: var(--secondary-text-color);
+}
+
+.category-card-posts {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 2rem; /* Keep user's value for space before 'More >>' */
+  flex-grow: 1;
+  /* Use Flexbox to control spacing between items */
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; /* Adjust this value to control space between li items */
+}
+
+.category-card-posts li {
+  margin-bottom: 0.8rem; /* 确保有足够空间显示标签 */
+}
+.category-card-posts li a {
+    text-decoration: none;
+    display: inline-block; /* Change from block to inline-block */
+    line-height: 1.1; /* Keep user's value */
+    font-size: 1.7rem; /* Increased font size */
+    color: #000; /* Keep black as requested before */
+    
+    /* Remove truncation rules to allow wrapping */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    /* white-space: nowrap; */
+}
+.category-card-posts li a:hover {
+    text-decoration: none;
+    color: #2983bb;
+}
+
+.category-card-more {
+  display: block; /* Make link take full width */
+  text-align: right; /* Align text to the right */
+  font-size: 1.5rem; /* Increased font size */
+  text-decoration: none;
+  color: var(--primary-color); /* Keep default theme color */
+}
+.category-card-more:hover {
+    text-decoration: none;
+    color: #2983bb;
+}
+
+/* Responsive adjustments: stack to single column on smaller screens */
+@media (max-width: 768px) {
+  .categories-grid-container {
+    grid-template-columns: 1fr; /* Single column */
+  }
+}
+
+/* Styles for the Collections Section ON TERM PAGES */
+.term-collections-section { /* Updated class */
+  margin-top: 4rem;
+}
+
+.term-collections-section h2 { /* Updated class */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Remove the grid layout */
+/* .collections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+} */
+
+.term-collection-card { /* Updated class */
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--card-border-radius);
+  padding: 1rem 1.5rem;
+  background-color: var(--card-background);
+  box-shadow: var(--card-box-shadow);
+  margin-bottom: 1.5rem; /* Add space between collection cards */
+}
+
+.term-collection-title { /* Updated class */
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5em; /* Keep user's value */
+  display: flex;
+  align-items: center;
+  gap: 0.3em; /* Decreased gap */
+}
+
+.term-collection-title svg { /* Updated class */
+    width: 1.2em; /* Increased size */
+    height: 1.2em; /* Increased size */
+    fill: currentColor; /* Make icon inherit text color */
+    stroke: none; /* Remove stroke if any */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.term-collection-title sup { /* Updated class */
+  font-size: 0.8em;
+  margin-left: 0.3em;
+  color: var(--secondary-text-color);
+}
+
+.term-collection-post-list { /* Updated class */
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  font-size: 1.8rem; /* Significantly increased size */
+}
+
+.term-collection-post-list li { /* Updated class */
+  margin-bottom: 1.8rem; /* Increased space between list items */
+}
+.term-collection-post-list li a { /* Updated class */
+    text-decoration: none;
+    color: var(--content-text-color);
+}
+.term-collection-post-list li a:hover { /* Updated class */
+    text-decoration: none; /* Remove underline */
+    color: #2983bb; /* Set specific blue */
+}
+
+/* Styles for Sidebar Widgets */
+
+/* Style the container H2 for Categories widget */
+/* Remove gap from H2 as it now only contains the link */
+.categories-widget-title {
+  display: flex;
+  align-items: center;
+  /* gap: 0.5em; */ /* Gap will be applied to the link now */
+}
+
+/* Style the link itself to align icon and text */
+.categories-widget-title a {
+  display: inline-flex; /* Use inline-flex for alignment */
+  align-items: center;
+  gap: 0.3em; /* Reduced gap between icon and text */
+  color: #9370db; /* Medium Purple text */
+  text-decoration: none;
+}
+
+/* Style the icon within the Categories link */
+.categories-widget-title a svg {
+  stroke: #9370db; /* Medium purple stroke */
+  fill: none;
+  width: 2em; /* Increased size */
+  height: 2em; /* Increased size */
+  flex-shrink: 0;
+}
+
+/* Style the text span within the Categories link */
+.categories-widget-title a span {
+   /* Inherits color from parent 'a' by default */
+}
+
+/* Apply hover styles to the link */
+.categories-widget-title a:hover {
+  color: #2983bb; /* Specific blue text on hover */
+  text-decoration: none; /* Ensure no underline */
+}
+/* Change icon stroke color on link hover */
+.categories-widget-title a:hover svg {
+  stroke: #2983bb; /* Specific blue stroke on hover */
+}
+
+/* Remove or update the old conflicting rules */
+/* .categories-widget-title svg { ... } */
+/* .categories-widget-title a { ... } */
+/* .categories-widget-title a:hover { ... } */
+
+/* Style for page title with icon (e.g., on /categories2/) */
+.page-title-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.2em; /* Keep user's value */
+}
+
+.page-title-with-icon svg {
+  width: 1.3em; /* Keep user's value */
+  height: 1.3em; /* Keep user's value */
+  fill: #000; /* Black color */
+  stroke: none; /* Ensure no stroke */
+  flex-shrink: 0;
+}
+
+.page-title-with-icon span {
+  /* Text inherits H1 styles */
+}
+
+/* Keep original centering rule for the H2 container */
+.term-collections-section h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+/* Style the H2 when it contains the icon */
+.term-collections-section-title {
+  display: inline-flex; /* Use inline-flex within the centered h2 */
+  align-items: center;
+  gap: 0.2em; /* Decreased gap further */
+  /* text-align will be inherited (center) */
+}
+
+.term-collections-section-title svg {
+  width: 1.3em; /* Increased size further */
+  height: 1.3em; /* Increased size further */
+  fill: #000; /* Black color */
+  stroke: none;
+  flex-shrink: 0;
+}
+
+.term-collections-section-title span {
+  /* Inherits styles */
+}
+
+/* Reduce space below header on /categories2 page */
+body.section-categories2 header.page-header {
+    margin-bottom: 0.5rem; /* Revert to a small positive margin */
+}
+
+/* Adjust spacing in left sidebar main menu */
+#main-menu li a {
+  display: inline-flex; /* Use flex for icon/text alignment */
+  align-items: center; /* Vertically align icon and text */
+  gap: 1em; /* Adjust this value to control spacing */
+}
+
+#main-menu li a svg {
+  /* Optional: Adjust icon size if needed */
+  /* width: 1.1em; */
+  /* height: 1.1em; */
+  flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+#main-menu li a span {
+  /* Text styles */
+}
+
+/* Adjust spacing in left sidebar bottom section */
+#i18n-switch,
+#dark-mode-toggle {
+  display: flex;
+  align-items: center; /* Vertically center icon and text/select */
+  gap: 1em; /* Reduce gap between icon and text/select */
+}
+
+#i18n-switch svg,
+#dark-mode-toggle svg {
+  flex-shrink: 0; /* Prevent icons from shrinking */
+}
+
+/* Style the custom static Categories link in the left sidebar */
+.static-categories-link a {
+  display: inline-flex; /* Align icon and text */
+  align-items: center;
+  gap: 0.5em; /* Use the same gap as other menu items */
+  color: var(--menu-text-color); /* Use theme variable for default color */
+  text-decoration: none;
+}
+
+.static-categories-link a svg {
+  flex-shrink: 0;
+  /* Icon color will likely inherit via currentColor or theme defaults */
+}
+
+/* Override hover effect specifically for this link */
+.static-categories-link a:hover {
+  color: var(--menu-text-color); /* Keep the default color on hover */
+  text-decoration: none; /* Ensure no underline */
+}
+.static-categories-link a:hover svg {
+    /* Prevent icon color change on hover if needed */
+    /* fill: currentColor; */ /* Or specific color */
+    /* stroke: var(--menu-text-color); */
+}
+
+/* 修改标签样式区域 */
+/* 分类标题下方的标签容器 */
+.category-tags-container {
+  margin: 0.5rem 0 1rem 0; /* 上、右、下、左边距，调整标签区与标题和文章列表的间距 */
+  padding: 0.3rem 0;
+  border: 1px dashed #ddd; /* 虚线边框，形成"框框"效果 */
+  border-radius: 0.25rem;
+  background-color: rgba(0,0,0,0.02); /* 浅灰色背景，增强框框效果 */
+}
+
+/* 标签列表样式 */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 0.5rem;
+  gap: 0.3rem; /* 标签之间的间距 */
+}
+
+/* 单个标签样式 */
+.tag-badge {
+  display: inline-block;
+  padding: 0.25rem 0.7rem; /* 再增加内边距以适应更大的文字 */
+  margin: 0.2rem;
+  font-size: 1.5rem; /* 进一步增大字体大小 */
+  border-radius: 0.25rem;
+  background-color: #2c3e50; /* 深蓝灰色背景，按用户要求 */
+  border: none; /* 移除边框 */
+  color: white; /* 白色文字，按用户要求 */
+  text-decoration: none;
+  white-space: normal; /* 改为 normal 以允许换行 */
+  transition: all 0.3s ease; /* 稍微增加过渡时间，使效果更加明显 */
+}
+
+.tag-badge:hover {
+  background-color: #2983bb; /* 明亮的蓝色背景，根据用户要求 */
+  color: white; /* 保持白色文字 */
+  text-decoration: none;
+  transform: translateY(-2px); /* 稍微上浮 */
+  box-shadow: 0 4px 8px rgba(41, 131, 187, 0.5); /* 添加蓝色阴影效果 */
+}
+
+/* 文章详情页 Collections 标签样式 */
+.article-collections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  margin-left: 1rem; /* 与文章标题对齐 */
+}
+
+.collection-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem; /* 增加内边距以适应更大的文字 */
+  margin: 0.1rem 0;
+  font-size: 1.8rem; /* 增大字体大小 */
+  border-radius: 0.25rem;
+  background-color: #707070; /* 灰色背景，按用户要求 */
+  color: white; /* 白色文字，按用户要求 */
+  cursor: default; /* 不可点击的鼠标样式 */
+}
+
+/* 分类页面顶部 Collections 标签汇总样式 */
+.term-summary-collections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem 0;
+  padding: 0.5rem;
+  border: 1px dashed #ddd;
+  border-radius: 0.25rem;
+  background-color: rgba(0,0,0,0.02);
+}
+
+.term-summary-collection-badge {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  margin: 0.1rem;
+  font-size: 1.5rem; /* 按用户要求的大小 */
+  border-radius: 0.25rem;
+  background-color: #707070; /* 灰色背景，按用户要求 */
+  color: white; /* 白色文字，按用户要求 */
+  cursor: default; /* 不可点击的鼠标样式 */
+  /* 无悬停效果 */
+}
+
+/* 分类页面下方的 Tags 区域样式 */
+.term-tags-section {
+  margin-top: 4rem;
+}
+
+.term-tags-section-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+}
+
+.term-tags-section-title svg {
+  width: 1.3em;
+  height: 1.3em;
+  fill: #000;
+  stroke: none;
+  flex-shrink: 0;
+}
+
+.term-tag-card {
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--card-border-radius);
+  padding: 1rem 1.5rem;
+  background-color: var(--card-background);
+  box-shadow: var(--card-box-shadow);
+  margin-bottom: 1.5rem;
+}
+
+.term-tag-title {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.term-tag-title svg {
+  width: 1.2em;
+  height: 1.2em;
+  fill: currentColor;
+  stroke: none;
+  flex-shrink: 0;
+}
+
+.term-tag-title sup {
+  font-size: 0.8em;
+  margin-left: 0.3em;
+  color: var(--secondary-text-color);
+}
+
+.term-tag-post-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+  font-size: 1.8rem;
+}
+
+.term-tag-post-list li {
+  margin-bottom: 1.8rem;
+}
+
+.term-tag-post-list li a {
+  text-decoration: none;
+  color: var(--content-text-color);
+}
+
+.term-tag-post-list li a:hover {
+  text-decoration: none;
+  color: #2983bb;
+}
+
+/* 修改标签集合的样式，适应新位置 */
+.term-header-collections {
+  margin: 0 0 2rem 0;
+  padding: 0 1.5rem;
+}
+
+/* Style for Series Titles in Categories Widget */
+.widget-subtitle.series-title {
+    margin-top: 0.5rem;  /* User adjusted space above the title */
+    margin-bottom: 0.5rem; /* Keep space below */
+    font-size: 1.2em;  /* Keep font smaller */
+    font-weight: normal; /* Keep font normal */
+    font-style: italic; /* Keep italics */
+    text-decoration: none; /* Keep no underline */
+    color: black; /* Set base text color to black */
+    text-shadow: 0 0 5px #9674dc, /* Inner glow */
+                 0 0 8px #9674dc; /* Outer glow for more intensity */
+}
+
+/* NEW Style for Series displayed above article title in lists */
+.article-header-series {
+    margin-bottom: 0.3rem; /* Space between series and article title */
+    font-size: 1.2em; /* Slightly smaller */
+}
+
+.article-header-series .series-item {
+    font-style: italic;
+    color: black;
+    text-shadow: 0 0 5px #9674dc, /* Inner glow */
+                 0 0 8px #9674dc; /* Outer glow */
+}
+
+/* Increase font size for Categories widget tags */
+.widget.tagCloud .tagCloud-tags a {
+    font-size: 1.1em; /* Increase font size slightly */
+    /* You might also need to adjust padding or margins if the layout breaks */
+    /* padding: 0.3em 0.7em; */
+    /* margin: 0.2em; */
+}

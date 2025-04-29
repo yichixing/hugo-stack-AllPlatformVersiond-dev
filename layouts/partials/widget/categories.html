@@ -1,0 +1,125 @@
+{{- $context := .Context -}}
+
+{{/* 1. Get all unique series names across the site */}}
+{{- $allSeries := slice -}}
+{{- range site.RegularPages -}}
+    {{- with .Params.series -}}
+        {{- if reflect.IsSlice . -}}
+            {{- $allSeries = $allSeries | append . -}}
+        {{- else -}}
+            {{- $allSeries = $allSeries | append (slice .) -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+{{- $uniqueSeries := $allSeries | uniq | sort -}}
+
+{{/* 2. Get all categories (Alphabetical for consistent ordering) */}}
+{{- $allCategories := $context.Site.Taxonomies.categories.Alphabetical -}}
+
+{{/* 3. Prepare data structures */}}
+{{- $seriesCategoryMap := dict -}} {{/* Map: SeriesName -> List<CategoryTerm> */}}
+{{- $noSeriesCategories := slice -}} {{/* List<CategoryTerm> */}}
+
+{{/* 4. Populate data structures */}}
+{{- range $categoryTerm := $allCategories -}}
+    {{- $categoryHasSeries := false -}}
+    {{- $categorySeriesList := slice -}}
+    {{- range $categoryTerm.Pages -}}
+        {{- with .Params.series -}}
+            {{- $categoryHasSeries = true -}}
+            {{- if reflect.IsSlice . -}}
+                {{- $categorySeriesList = $categorySeriesList | append . -}}
+            {{- else -}}
+                {{- $categorySeriesList = $categorySeriesList | append (slice .) -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if $categoryHasSeries -}}
+        {{- $uniqueCategorySeries := $categorySeriesList | uniq -}}
+        {{- range $seriesName := $uniqueCategorySeries -}}
+            {{- $currentList := index $seriesCategoryMap $seriesName | default slice -}}
+            {{- $seriesCategoryMap = merge $seriesCategoryMap (dict $seriesName ( $currentList | append $categoryTerm )) -}}
+        {{- end -}}
+    {{- else -}}
+        {{- $noSeriesCategories = $noSeriesCategories | append $categoryTerm -}}
+    {{- end -}}
+{{- end -}}
+
+{{/* 5. Render the widget - REORDERED */}}
+<section class="widget tagCloud categories-grouped"> {{/* Add tagCloud class back for styling */}}
+    <h2 class="widget-title section-title categories-widget-title">
+        <a href="{{ "categories2/" | relURL }}">
+            {{ partial "helper/icon" "categories" }}
+            <span>{{ T "widget.categoriesCloud.title" }}</span> {{/* Keep original title */}}
+        </a>
+    </h2>
+
+    {{/* --- START: Render categories with NO series FIRST --- */}}
+    {{- $tempNoSeriesCategories := $noSeriesCategories -}}
+    {{- $uniqueNoSeriesCategoriesMap := dict -}}
+    {{- range $cat := $tempNoSeriesCategories -}}
+        {{- $title := $cat.Page.Title -}}
+        {{- if not (isset $uniqueNoSeriesCategoriesMap $title) -}}
+            {{- $uniqueNoSeriesCategoriesMap = merge $uniqueNoSeriesCategoriesMap (dict $title $cat) -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $sortedNoSeriesCategories := slice -}}
+    {{- range $title, $cat := $uniqueNoSeriesCategoriesMap -}}
+        {{- $sortedNoSeriesCategories = $sortedNoSeriesCategories | append $cat -}}
+    {{- end -}}
+    {{- $sortedNoSeriesCategories = sort $sortedNoSeriesCategories "Page.Title" -}}
+
+    {{- $hasNoSeriesCategories := gt (len $sortedNoSeriesCategories) 0 -}}
+    {{- if $hasNoSeriesCategories -}}
+        {{/* Optional: Add a title like <h3 class="widget-subtitle">General Categories</h3> */}}
+        <div class="tagCloud-tags">
+            {{- range $sortedNoSeriesCategories -}}
+                <a href="{{ .Page.RelPermalink }}" class="font_size_{{ .Count }}">
+                    {{ .Page.Title }} <sup>({{ .Count }})</sup>
+                </a>
+            {{- end -}}
+        </div>
+    {{- end -}}
+    {{/* --- END: Render categories with NO series --- */}}
+
+
+    {{/* --- START: Render categories grouped by series SECOND --- */}}
+    {{- $hasSeriesCategories := gt (len $uniqueSeries) 0 -}}
+    {{- if $hasSeriesCategories -}}
+        {{- if $hasNoSeriesCategories }} {{/* Only add separator if both sections exist */}}
+        <hr class="widget-separator">
+        {{- end -}}
+
+        {{- range $seriesName := $uniqueSeries -}}
+            {{- with index $seriesCategoryMap $seriesName -}}
+                {{- $tempCategories := . -}} {{/* Original list for this series */}}
+                {{- $uniqueCategoriesInSeriesMap := dict -}} {{/* Helper map for uniqueness */}}
+                {{- range $cat := $tempCategories -}}
+                    {{- $title := $cat.Page.Title -}}
+                    {{- if not (isset $uniqueCategoriesInSeriesMap $title) -}}
+                        {{- $uniqueCategoriesInSeriesMap = merge $uniqueCategoriesInSeriesMap (dict $title $cat) -}}
+                    {{- end -}}
+                {{- end -}}
+                {{- $categoriesInSeries := slice -}} {{/* Build the final unique list */}}
+                {{- range $title, $cat := $uniqueCategoriesInSeriesMap -}}
+                    {{- $categoriesInSeries = $categoriesInSeries | append $cat -}}
+                {{- end -}}
+                {{- $categoriesInSeries = sort $categoriesInSeries "Count" "desc" -}} {{/* Sort the unique list by Count DESC */}}
+
+                {{- if gt (len $categoriesInSeries) 0 -}}
+                    <h3 class="widget-subtitle series-title">{{ $seriesName }}</h3>
+                    <div class="tagCloud-tags"> {{/* Reuse class for consistency */}}
+                        {{- range $categoriesInSeries -}}
+                            <a href="{{ .Page.RelPermalink }}" class="font_size_{{ .Count }}">
+                                {{ .Page.Title }} <sup>({{ .Count }})</sup>
+                            </a>
+                        {{- end -}}
+                    </div>
+                {{- end -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{/* --- END: Render categories grouped by series --- */}}
+
+</section> 

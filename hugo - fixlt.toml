@@ -1,0 +1,94 @@
+# =====================================================================================
+# The following is a necessary configuration for the FixIt theme.
+# =====================================================================================
+
+# -------------------------------------------------------------------------------------
+# Hugo Configuration
+# See: https://gohugo.io/getting-started/configuration/
+# -------------------------------------------------------------------------------------
+
+title = "笔记博客"
+
+#baseURL = "https://hugo-fixlt-dev.tcapital.top/"
+#baseURL ="https://yichixing.github.io/hugo-Fixlt-dev"
+#Change the default theme to be use when building the site with Hugo
+
+#baseURL = "/"  # 设置为根路径
+#relativeURLs = true  # 启用相对路径
+
+
+
+
+baseURL = "env.HUGO_BASEURL"
+
+
+
+
+
+
+
+
+
+theme = "hugo-theme-stack"
+
+[markup]
+  _merge = "shallow"
+
+[outputs]
+  _merge = "shallow"
+
+# -------------------------------------------------------------------------------------
+# Taxonomies Configuration
+# See: https://gohugo.io/content-management/taxonomies/#configure-taxonomies
+# -------------------------------------------------------------------------------------
+
+[taxonomies]
+  _merge = "shallow"
+
+# -------------------------------------------------------------------------------------
+# Theme Core Configuration
+# See: https://fixit.lruihao.cn/documentation/basics/#theme-configuration
+# -------------------------------------------------------------------------------------
+
+[params]
+  # FixIt theme version
+  version = "0.3.X" # e.g. "0.2.X", "0.2.15", "v0.2.15" etc.
+  # ...
+  mainSections = ["post", "posts"]
+  
+  # 添加自定义 CSS 文件
+  [params.customCSS]
+    enable = true
+    # 链接到我们新创建的 CSS 文件
+    url = "/css/custom.css"
+
+# Search config
+[params.search]
+  enable = true
+  # type of search engine ["lunr", "algolia", "fuse"]
+  type = "fuse"
+  # max index length of the chunked content
+  contentLength = 4000
+  # placeholder of the search bar
+  placeholder = ""
+  # max number of results length
+  maxResultLength = 10
+  # snippet length of the result
+  snippetLength = 30
+  # HTML tag name of the highlight part in results
+  highlightTag = "em"
+  # whether to use the absolute URL based on the baseURL in search index
+  absoluteURL = false
+  [params.search.fuse]
+    # FixIt 0.3.10 | NEW https://fusejs.io/api/options.html
+    isCaseSensitive = false
+    minMatchCharLength = 2
+    findAllMatches = false
+    location = 0
+    threshold = 0.3
+    distance = 100
+    ignoreLocation = false
+    useExtendedSearch = false
+    ignoreFieldNorm = false
+  # Search results page URL (layout: search)
+  resultsPage = "/search/"

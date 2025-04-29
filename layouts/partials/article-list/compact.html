@@ -1,0 +1,71 @@
+<article>
+    <a href="{{ .RelPermalink }}">
+        <div class="article-details">
+            {{/* --- START: Display Series for this Article --- */}}
+            {{ with .Params.series }}
+                <div class="article-header-series">
+                    {{ $seriesList := slice }}
+                    {{ if reflect.IsSlice . }}
+                        {{ $seriesList = . }}
+                    {{ else }}
+                        {{ $seriesList = slice . }}
+                    {{ end }}
+                    {{ range $i, $series := $seriesList }}
+                        {{- if $i }}<strong>、</strong>{{ end -}}<span class="series-item">{{ $series }}</span>
+                    {{ end }}
+                </div>
+            {{ end }}
+            {{/* --- END: Display Series for this Article --- */}}
+
+            <h2 class="article-title">
+                {{- .Title -}}
+            </h2>
+            <footer class="article-time">
+                <time datetime='{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}'>
+                    {{- .Date.Format (or .Site.Params.dateFormat.published "Jan 02, 2006") -}}
+                </time>
+            </footer>
+        </div>
+
+        {{- $image := partialCached "helper/image" (dict "Context" . "Type" "articleList") .RelPermalink "articleList" -}}
+        {{ if $image.exists }}
+            <div class="article-image">
+                {{ if $image.resource }}
+                    {{- $Permalink := $image.resource.RelPermalink -}}
+                    {{- $Width := $image.resource.Width -}}
+                    {{- $Height := $image.resource.Height -}}
+
+                    {{- if (default true .Page.Site.Params.imageProcessing.cover.enabled) -}}
+                        {{- $thumbnail := $image.resource.Fill "120x120" -}}
+                        {{- $Permalink = $thumbnail.RelPermalink -}}
+                        {{- $Width = $thumbnail.Width -}}
+                        {{- $Height = $thumbnail.Height -}}
+                    {{- end -}}
+                    
+                    <img src="{{ $Permalink }}" 
+                        width="{{ $Width }}"
+                        height="{{ $Height }}" 
+                        alt="{{ .Title }}"
+                        loading="lazy">
+                {{ else }}
+                    <img src="{{ $image.permalink }}" loading="lazy" alt="Featured image of post {{ .Title }}" />
+                {{ end }}
+            </div>
+        {{ end }}
+    </a>
+    
+    {{/* 添加 Collections 标签 - 安全处理字符串或数组类型 */}}
+    {{ if .Params.collections }}
+        <div class="article-collections">
+            {{ if reflect.IsSlice .Params.collections }}
+                {{/* 数组类型的 collections */}}
+                {{ range .Params.collections }}
+                    <span class="collection-badge">{{ . }}</span>
+                {{ end }}
+            {{ else }}
+                {{/* 字符串类型的 collections */}}
+                <span class="collection-badge">{{ .Params.collections }}</span>
+            {{ end }}
+        </div>
+    {{ end }}
+</article> 

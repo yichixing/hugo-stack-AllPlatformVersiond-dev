@@ -1,0 +1,36 @@
+/* Place your custom SCSS in HUGO_SITE_FOLDER/assets/scss/custom.scss */
+
+.tag-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  margin: 2px 5px 2px 0;
+  font-size: 0.85em;
+  line-height: 1.4;
+  color: var(--card-text-color-main); /* Use theme variable for text color */
+  background-color: var(--card-background); /* Use theme variable for background */
+  border: 1px solid var(--card-border-color); /* Use theme variable for border */
+  border-radius: 15px; /* Adjust for desired roundness */
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tag-badge:hover {
+  border-color: var(--primary-color); /* Use theme primary color for hover border */
+  color: var(--primary-color); /* Use theme primary color for hover text */
+}
+
+.tag-list {
+    display: inline;
+    margin-left: 8px;
+}
+
+.category-card-posts li {
+    line-height: 1.8; /* Ensure enough space for tags */
+}
+
+/* Test rule to check if this file is loaded */
+body {
+    background-color: black !important;
+}
+
+
